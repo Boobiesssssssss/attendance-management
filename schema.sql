@@ -1,0 +1,42 @@
+PRAGMA foreign_keys = ON;
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT NOT NULL UNIQUE,
+  full_name TEXT NOT NULL,
+  password_hash TEXT NOT NULL,
+  role TEXT NOT NULL CHECK(role IN ('admin','teacher')),
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE classes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  section TEXT NOT NULL,
+  UNIQUE(name, section)
+);
+CREATE TABLE students (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  admission_no TEXT NOT NULL UNIQUE,
+  full_name TEXT NOT NULL,
+  class_id INTEGER NOT NULL REFERENCES classes(id) ON DELETE RESTRICT,
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE subjects (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE
+);
+CREATE TABLE teacher_classes (
+  teacher_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  class_id INTEGER NOT NULL REFERENCES classes(id) ON DELETE CASCADE,
+  PRIMARY KEY(teacher_id, class_id)
+);
+CREATE TABLE attendance (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE RESTRICT,
+  attendance_date TEXT NOT NULL,
+  status TEXT NOT NULL CHECK(status IN ('Present','Absent','Leave')),
+  marked_by INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(student_id, attendance_date)
+);

@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: school-attendance-system
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    healthCheckPath: /health
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_PATH
+        value: /var/data/attendance.db
+      - key: COOKIE_SECURE
+        value: "1"
+    disk:
+      name: attendance-data
+      mountPath: /var/data
+      sizeGB: 1
